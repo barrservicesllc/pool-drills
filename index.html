@@ -93,16 +93,37 @@ h1 {
 
 /* Next up */
 .next-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 10px;
+  margin-bottom: 28px;
+}
+.next-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 28px;
+  padding: 12px 6px 4px;
 }
+.next-fig svg, .fig svg { display: block; width: 100%; height: auto; border-radius: 10px; }
+.fig { margin: 0 0 6px; }
+.legend { margin: 8px 2px 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
+
+/* Table diagram marks */
+.z { fill: rgba(255,255,255,.16); stroke: rgba(255,255,255,.55); stroke-width: .4; stroke-dasharray: 1.5 1; }
+.zt { fill: rgba(255,255,255,.9); font: 700 7px var(--display); text-anchor: middle; }
+.ttxt { fill: rgba(255,255,255,.92); font: 700 5px var(--display); text-anchor: middle; }
+.pl { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.p-cue { stroke: #fff; stroke-width: .9; }
+.p-cuedash { stroke: #fff; stroke-width: .9; stroke-dasharray: 2.2 1.6; }
+.p-cuefaint { stroke: #fff; stroke-width: .8; opacity: .4; }
+.p-obj { stroke: #ffd54a; stroke-width: .9; }
+.p-objfaint { stroke: #ffd54a; stroke-width: .8; opacity: .4; stroke-dasharray: 2 1.6; }
+.p-route { stroke: #fff; stroke-width: .6; opacity: .65; stroke-dasharray: 1.4 1.6; }
+.rg { fill: none; stroke: #8fe8ff; stroke-width: .7; stroke-dasharray: 1.4 1; }
+.gh { fill: none; stroke: #fff; stroke-width: .5; stroke-dasharray: 1.1 .9; }
+.bn { fill: #111; font: 700 2.2px var(--display); text-anchor: middle; }
 .next-label { margin: 0 0 2px; color: var(--muted); font-size: 15px; }
 .next-title { font-size: 30px; font-weight: 700; line-height: 1.05; }
 .primary {
@@ -410,11 +431,11 @@ details p { margin: 4px 0 10px; }
       goal: 'Hit the object ball after the cue ball touches two rails first. Shoot 10 times.',
       score: '1 point for each shot where the cue ball hits the object ball after two rails.' },
     { t: 'Cross-Corner Bank', max: 10,
-      setup: 'Put an object ball near a long rail, a couple of diamonds from the side pocket. Put the cue ball behind it.',
+      setup: 'Put an object ball one or two diamonds off a long rail, about a diamond from the side pocket. Put the cue ball behind it, in line with where you want the ball to go.',
       goal: 'Bank the ball across the table off the opposite long rail and into a corner pocket. Shoot 10 times.',
       score: '1 point for each ball pocketed.' },
     { t: 'Cross-Side Bank', max: 10,
-      setup: 'Put an object ball near a long rail, a couple of diamonds from a corner pocket. Put the cue ball behind it.',
+      setup: 'Put an object ball about two diamonds off a long rail and two diamonds back from the side pocket. Put the cue ball behind it, in line with where you want the ball to go.',
       goal: 'Bank the ball across the table off the opposite long rail and into the side pocket on the side it started. Shoot 10 times.',
       score: '1 point for each ball pocketed.' },
     { t: 'Safety to the Rail', max: 10,
@@ -452,6 +473,151 @@ details p { margin: 4px 0 10px; }
       goal: 'Pocket the ball and stop the cue ball. Shoot 10 times, then compare with your Day 1 score.',
       score: '1 point for each shot that is pocketed and stops.' }
   ];
+
+  // ---------- Table diagrams ----------
+  var R = 2.2, DIA = 12.5, S2 = Math.SQRT1_2;
+  var BR = [100, 50], TR = [100, 0];
+  function dg(n) { return [100 - n * DIA * S2, 50 - n * DIA * S2]; }
+  function unit(a, b) { var dx = b[0] - a[0], dy = b[1] - a[1], l = Math.sqrt(dx * dx + dy * dy); return [dx / l, dy / l]; }
+  function ghost(ob, pk) { var u = unit(ob, pk); return [ob[0] - u[0] * 2 * R, ob[1] - u[1] * 2 * R]; }
+  function rot(v, deg) { var a = deg * Math.PI / 180, c = Math.cos(a), sn = Math.sin(a); return [v[0] * c - v[1] * sn, v[0] * sn + v[1] * c]; }
+  function cutCue(ob, pk, dist, deg) { var g = ghost(ob, pk), v = rot(unit(ob, pk), deg); return [g[0] - v[0] * dist, g[1] - v[1] * dist]; }
+  function add(p, u, k) { return [p[0] + u[0] * k, p[1] + u[1] * k]; }
+
+  function straightIn(obN, cueN, extra) {
+    var ob = dg(obN), cue = dg(cueN), g = ghost(ob, BR);
+    var a = [['path', 'obj', [ob, BR]], ['path', 'cue', [cue, g]], ['obj', ob[0], ob[1], 0], ['cue', cue[0], cue[1]]];
+    return a.concat(extra ? extra(ob, g) : []);
+  }
+  function halfBall(extra) {
+    var ob = [50, 25], cue = [25, 25], g = ghost(ob, BR);
+    var a = [['path', 'objfaint', [ob, TR]], ['path', 'obj', [ob, BR]], ['path', 'cue', [cue, g]], ['ghost', g[0], g[1]], ['obj', ob[0], ob[1], 0], ['cue', cue[0], cue[1]]];
+    return a.concat(extra ? extra(ob, cue, g) : []);
+  }
+  function runFig(cue, balls) {
+    var out = [['path', 'route', [cue].concat(balls)], ['hand', cue[0], cue[1]]];
+    balls.forEach(function (b, i) { out.push(['obj', b[0], b[1], i, String(i + 1)]); });
+    return out;
+  }
+  function rackOps() {
+    var rows = [[0], [-2.2, 2.2], [-4.4, 0, 4.4], [-2.2, 2.2], [0]];
+    var nums = [1, 2, 3, 4, 9, 5, 6, 7, 8], k = 0, out = [];
+    rows.forEach(function (offs, r) {
+      offs.forEach(function (o) { var n = nums[k++]; out.push(['obj', 75 + r * 3.81, 25 + o, n === 9 ? 0 : n - 1, String(n)]); });
+    });
+    return out;
+  }
+  function cutPair(dist, deg) {
+    var ob = dg(2), g = ghost(ob, BR), c1 = cutCue(ob, BR, dist, -deg), c2 = cutCue(ob, BR, dist, deg);
+    if (deg < 20) { var t = c1; c1 = c2; c2 = t; }
+    return [['path', 'obj', [ob, BR]], ['path', 'cuefaint', [c2, g]], ['path', 'cue', [c1, g]], ['ghost', g[0], g[1]], ['obj', ob[0], ob[1], 0], ['cue', c2[0], c2[1], 0.35], ['cue', c1[0], c1[1]]];
+  }
+
+  var figStop = function () { return straightIn(1, 3, function (ob, g) { return [['ring', g[0], g[1], R + 1]]; }); };
+  var figHalf = function () { return halfBall(); };
+  var FIGS = [
+    figStop,
+    function () { return [['ring', 25, 25, 8], ['path', 'cue', [[25, 25], [96, 25]]], ['path', 'cuedash', [[96, 27.5], [30, 27.5]]], ['cue', 25, 25]]; },
+    function () { return straightIn(3, 5, function (ob, g) { var e = add(g, unit(ob, BR), DIA); return [['path', 'cuedash', [g, e]], ['ring', e[0], e[1], R + 1]]; }); },
+    function () { return straightIn(2, 4, function (ob, g) { var u = unit(ob, BR), a = add(g, [-u[1], u[0]], 3.6), e = add(a, u, -DIA); return [['path', 'cuedash', [a, e]], ['ring', e[0], e[1], R + 1]]; }); },
+    function () { return straightIn(1, 5, function (ob, g) { return [['ring', g[0], g[1], R + 1]]; }); },
+    function () { return [['zone', 0, 0, 12.5, 50, '2'], ['zone', 12.5, 0, 12.5, 50, '1'], ['path', 'cue', [[25, 25], [96, 25]]], ['path', 'cuedash', [[96, 27.5], [6, 27.5]]], ['cue', 25, 25]]; },
+    figHalf,
+    function () { return cutPair(28, 12); },
+    function () { return cutPair(25, 49); },
+    function () {
+      var ob = [50, 25], cue = [25, 25], g1 = ghost(ob, BR), g2 = ghost(ob, TR);
+      return [['path', 'obj', [ob, BR]], ['path', 'obj', [ob, TR]], ['path', 'cue', [cue, g1]], ['path', 'cuedash', [cue, g2]], ['ghost', g1[0], g1[1]], ['ghost', g2[0], g2[1]], ['obj', ob[0], ob[1], 0], ['cue', cue[0], cue[1]]];
+    },
+    function () { return halfBall(function (ob, cue, g) { var e = [g[0] + 15, g[1] - 10.5]; return [['path', 'cuedash', [g, e]], ['ring', e[0], e[1], R + 1]]; }); },
+    function () { return halfBall(function (ob, cue, g) { var m = [g[0] + 3, g[1] - 7], e = [g[0] - 5, g[1] - 13.5]; return [['path', 'cuedash', [g, m, e]], ['ring', e[0], e[1], R + 1]]; }); },
+    function () {
+      var ob = dg(1), g = ghost(ob, BR), a = [['path', 'obj', [ob, BR]], ['path', 'cue', [dg(5), g]], ['obj', ob[0], ob[1], 0]];
+      for (var i = 2; i <= 5; i++) { var c = dg(i); a.push(['cue', c[0], c[1], 0.6, String(i - 1)]); }
+      return a;
+    },
+    function () { return runFig([20, 30], [[42, 16], [70, 34]]); },
+    function () { return runFig([16, 26], [[34, 14], [58, 34], [82, 16]]); },
+    function () { return runFig([14, 30], [[30, 12], [52, 36], [74, 14], [88, 34]]); },
+    function () { return halfBall(function (ob, cue, g) { var e = [g[0] + 15, g[1] - 10.5]; return [['zone', 33.33, 0, 33.34, 50, ''], ['path', 'cuedash', [g, e]], ['ring', e[0], e[1], R + 1]]; }); },
+    function () { return runFig([12, 28], [[28, 12], [44, 38], [62, 16], [78, 36], [90, 14]]); },
+    function () { return [['path', 'cue', [[12, 40], [30, 50], [75, 25]]], ['obj', 75, 25, 0], ['cue', 12, 40]]; },
+    function () { return [['path', 'cue', [[12, 40], [19.4, 50], [56.5, 0], [75, 25]]], ['obj', 75, 25, 0], ['cue', 12, 40]]; },
+    function () { return [['path', 'obj', [[35, 32], [60.4, 0], [100, 50]]], ['path', 'cue', [[27.5, 41.4], [35, 32]]], ['obj', 35, 32, 0], ['cue', 27.5, 41.4]]; },
+    function () { return [['path', 'obj', [[30, 30], [37.5, 0], [50, 50]]], ['path', 'cue', [[27.1, 41.6], [30, 30]]], ['obj', 30, 30, 0], ['cue', 27.1, 41.6]]; },
+    function () {
+      var ob = [50, 25], e = [59.6, 8.4], g = ghost(ob, e);
+      return [['zone', 0, 0, 100, 12.5, ''], ['path', 'obj', [ob, e]], ['path', 'cue', [[25, 25], g]], ['ghost', g[0], g[1]], ['obj', ob[0], ob[1], 0], ['cue', 25, 25]];
+    },
+    function () {
+      return [['path', 'cue', [[20, 40], [87.5, 26.5]]], ['path', 'cuedash', [[87.5, 28.5], [41, 26]]], ['path', 'obj', [[90, 25], [96.5, 22]]],
+        ['ring', 40, 25.5, R + 1], ['obj', 50, 25, 1], ['obj', 90, 25, 2], ['cue', 20, 40]];
+    },
+    function () {
+      return [['zone', 33.33, 0, 33.34, 50, ''], ['path', 'cue', [[12, 25], [72.8, 25]]], ['path', 'cuedash', [[72.5, 22.5], [52, 22.5]]], ['ring', 52, 22.5, R + 1]]
+        .concat(rackOps(), [['cue', 12, 25]]);
+    },
+    function () { return [['path', 'cue', [[25, 25], [72.8, 25]]]].concat(rackOps(), [['cue', 25, 25]]); },
+    figStop,
+    figHalf,
+    function () { return [['text', 50, 12, '10 shots, one of each']]; },
+    figStop
+  ];
+  var RUNNOTE = 'Example layout. The numbers show one possible order.';
+  var FIGNOTE = { 13: 'The numbered white balls are the four cue ball spots, one to four diamonds back.', 14: RUNNOTE, 15: RUNNOTE, 16: RUNNOTE, 18: RUNNOTE };
+
+  function f2(n) { return Math.round(n * 100) / 100; }
+  function ballSVG(x, y, fill, opacity, label) {
+    var s = '<g' + (opacity ? ' opacity="' + opacity + '"' : '') + '><circle cx="' + x + '" cy="' + y + '" r="' + R + '" fill="' + fill + '" stroke="rgba(0,0,0,.35)" stroke-width=".25"/>' +
+      '<circle cx="' + f2(x - 0.8) + '" cy="' + f2(y - 0.8) + '" r=".55" fill="rgba(255,255,255,.55)"/>';
+    if (label) { s += '<circle cx="' + x + '" cy="' + y + '" r="1.25" fill="#f7f7f2"/><text class="bn" x="' + x + '" y="' + f2(y + 0.8) + '">' + label + '</text>'; }
+    return s + '</g>';
+  }
+  function tableBase(id) {
+    var s = '<defs><radialGradient id="' + id + 'f" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="#2a8d5f"/><stop offset="1" stop-color="#1a6a48"/></radialGradient>' +
+      '<marker id="' + id + 'c" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 z" fill="#fff"/></marker>' +
+      '<marker id="' + id + 'o" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 z" fill="#ffd54a"/></marker></defs>' +
+      '<rect x="-7" y="-7" width="114" height="64" rx="5" fill="#6b3f24"/>' +
+      '<rect x="-2.6" y="-2.6" width="105.2" height="55.2" rx="2" fill="#155a3d"/>' +
+      '<rect x="0" y="0" width="100" height="50" fill="url(#' + id + 'f)"/>';
+    [[-0.8, -0.8], [100.8, -0.8], [-0.8, 50.8], [100.8, 50.8]].forEach(function (p) { s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.7" fill="#0b0b0b"/>'; });
+    [[50, -1.8], [50, 51.8]].forEach(function (p) { s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.3" fill="#0b0b0b"/>'; });
+    [12.5, 25, 37.5, 62.5, 75, 87.5].forEach(function (x) { s += '<circle cx="' + x + '" cy="-4.8" r=".7" fill="#e8d9a8"/><circle cx="' + x + '" cy="54.8" r=".7" fill="#e8d9a8"/>'; });
+    [12.5, 25, 37.5].forEach(function (y) { s += '<circle cx="-4.8" cy="' + y + '" r=".7" fill="#e8d9a8"/><circle cx="104.8" cy="' + y + '" r=".7" fill="#e8d9a8"/>'; });
+    s += '<circle cx="25" cy="25" r=".55" fill="rgba(255,255,255,.45)"/><circle cx="75" cy="25" r=".55" fill="rgba(255,255,255,.45)"/>';
+    return s;
+  }
+
+  var svgSeq = 0;
+  function tableSVG(d) {
+    var ops = FIGS[d - 1](), id = 'm' + (++svgSeq);
+    var under = '', rings = '', lines = '', balls = '', texts = '';
+    function pts(a) { return a.map(function (p) { return f2(p[0]) + ',' + f2(p[1]); }).join(' '); }
+    ops.forEach(function (o) {
+      var k = o[0];
+      if (k === 'zone') {
+        under += '<rect class="z" x="' + o[1] + '" y="' + o[2] + '" width="' + o[3] + '" height="' + o[4] + '"/>';
+        if (o[5]) { texts += '<text class="zt" x="' + (o[1] + o[3] / 2) + '" y="' + (o[2] + o[4] / 2 + 2.4) + '">' + o[5] + '</text>'; }
+      } else if (k === 'path') {
+        var m = (o[1] === 'obj' || o[1] === 'objfaint') ? 'o' : 'c';
+        lines += '<polyline class="pl p-' + o[1] + '" points="' + pts(o[2]) + '" marker-end="url(#' + id + m + ')"/>';
+      } else if (k === 'ring') {
+        rings += '<circle class="rg" cx="' + f2(o[1]) + '" cy="' + f2(o[2]) + '" r="' + o[3] + '"/>';
+      } else if (k === 'ghost') {
+        rings += '<circle class="gh" cx="' + f2(o[1]) + '" cy="' + f2(o[2]) + '" r="' + R + '"/>';
+      } else if (k === 'hand') {
+        rings += '<circle class="gh" cx="' + f2(o[1]) + '" cy="' + f2(o[2]) + '" r="' + (R + 1) + '"/>' + ballSVG(f2(o[1]), f2(o[2]), '#f7f7f2', 0.55, '');
+      } else if (k === 'cue') {
+        balls += ballSVG(f2(o[1]), f2(o[2]), '#f7f7f2', o[3] || 0, o[4] || '');
+      } else if (k === 'obj') {
+        balls += ballSVG(f2(o[1]), f2(o[2]), COLORS[o[3] || 0], 0, o[4] || '');
+      } else if (k === 'text') {
+        texts += '<text class="ttxt" x="' + o[1] + '" y="' + o[2] + '">' + o[3] + '</text>';
+      }
+    });
+    return '<svg viewBox="-7 -7 114 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Table diagram for ' + DRILLS[d - 1].t + '">' +
+      tableBase(id) + under + rings + lines + balls + texts + '</svg>';
+  }
 
   var KEY = 'pool-drills-v1';
   var store = { scores: {}, dates: {} };
@@ -524,8 +690,9 @@ details p { margin: 4px 0 10px; }
     var n = nextDay();
     if (n) {
       nextEl.innerHTML =
-        '<div><p class="next-label">Next up: Day ' + n + '</p><h2 class="next-title">' + DRILLS[n - 1].t + '</h2></div>' +
-        '<button type="button" class="primary" data-day="' + n + '">Open drill</button>';
+        '<div class="next-fig">' + tableSVG(n) + '</div>' +
+        '<div class="next-row"><div><p class="next-label">Next up: Day ' + n + '</p><h2 class="next-title">' + DRILLS[n - 1].t + '</h2></div>' +
+        '<button type="button" class="primary" data-day="' + n + '">Open drill</button></div>';
     } else {
       nextEl.innerHTML =
         '<div><p class="next-label">All 30 days done</p><h2 class="next-title">Tap any ball to beat your score</h2></div>';
@@ -580,6 +747,8 @@ details p { margin: 4px 0 10px; }
     inner.innerHTML =
       '<div class="sheet-top">' + ballHTML(d, true) +
         '<div><p>Day ' + d + ' of 30, ' + WEEKS[w] + '</p><h2 id="sheet-title">' + dr.t + '</h2></div></div>' +
+      '<div class="fig">' + tableSVG(d) +
+        '<p class="legend">Seen from above, head end on the left. White ball: cue ball and its path. Yellow line: object ball path. Dotted ball: cue ball at contact. Blue ring: where the cue ball should finish.' + (FIGNOTE[d] ? ' ' + FIGNOTE[d] : '') + '</p></div>' +
       '<h3>Setup</h3><p class="body">' + dr.setup + '</p>' +
       '<h3>Goal</h3><p class="body">' + dr.goal + '</p>' +
       '<h3>How to score</h3><p class="body">' + dr.score + '</p>' +
