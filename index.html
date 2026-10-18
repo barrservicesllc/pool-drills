@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>30-Day Pool Practice</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎱%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+:root {
+  --bg: #eef2f7;
+  --surface: #ffffff;
+  --ink: #14213a;
+  --muted: #566379;
+  --line: #d5dde9;
+  --chalk: #2a5db0;
+  --on-chalk: #ffffff;
+  --cue: #e0a800;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1a2c;
+    --surface: #17263e;
+    --ink: #e8eef8;
+    --muted: #9db0cc;
+    --line: #2a3d5c;
+    --chalk: #7aa5f0;
+    --on-chalk: #0f1a2c;
+    --cue: #f2c230;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1a2c;
+  --surface: #17263e;
+  --ink: #e8eef8;
+  --muted: #9db0cc;
+  --line: #2a3d5c;
+  --chalk: #7aa5f0;
+  --on-chalk: #0f1a2c;
+  --cue: #f2c230;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+main { max-width: 520px; margin: 0 auto; padding: 20px 16px 48px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; }
+button { font: inherit; color: inherit; }
+
+/* Header */
+h1 {
+  font-size: clamp(42px, 12vw, 58px);
+  font-weight: 700;
+  line-height: .95;
+  letter-spacing: -0.01em;
+}
+.lede { margin: 10px 0 20px; color: var(--muted); max-width: 34ch; }
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+.stat { padding: 12px 0 10px; text-align: center; }
+.stat + .stat { border-left: 1px solid var(--line); }
+.stat b {
+  display: block;
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat span { font-size: 14px; color: var(--muted); }
+
+/* Next up */
+.next-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 28px;
+}
+.next-label { margin: 0 0 2px; color: var(--muted); font-size: 15px; }
+.next-title { font-size: 30px; font-weight: 700; line-height: 1.05; }
+.primary {
+  min-height: 52px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--chalk);
+  color: var(--on-chalk);
+  font-weight: 700;
+  cursor: pointer;
+}
+.primary:focus-visible, .stepper button:focus-visible, .link-btn:focus-visible {
+  outline: 3px solid var(--cue);
+  outline-offset: 2px;
+}
+
+/* Rack of 30 */
+.week { margin-bottom: 22px; }
+.week-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.week-head h2 { font-size: 24px; font-weight: 600; line-height: 1.1; }
+.week-count { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.rack { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.cell {
+  display: grid;
+  gap: 3px;
+  justify-items: stretch;
+  padding: 3px;
+  background: none;
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.cell:focus-visible { outline: 3px solid var(--chalk); outline-offset: 2px; }
+.cap {
+  min-height: 1.2em;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.ball {
+  --c: #2563c9;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.6) 0 6%, rgba(255,255,255,0) 20%),
+    var(--c);
+  box-shadow: inset -4px -6px 10px rgba(0,0,0,.28);
+}
+.ball.stripe {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.6) 0 6%, rgba(255,255,255,0) 20%),
+    linear-gradient(to bottom, #f4f4ef 0 24%, var(--c) 24% 76%, #f4f4ef 76% 100%);
+}
+.ball .num {
+  display: grid;
+  place-items: center;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #f7f7f2;
+  color: #111;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(12px, 3.6vw, 17px);
+  line-height: 1;
+}
+.ball.todo, .ball.stripe.todo {
+  background: color-mix(in srgb, var(--c) 14%, var(--surface));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 55%, transparent);
+}
+.ball.todo .num { background: transparent; color: var(--muted); }
+.cell.next .ball { outline: 3px solid var(--cue); outline-offset: 3px; }
+
+/* Drill sheet */
+dialog {
+  width: 100%;
+  max-width: 520px;
+  max-height: 92dvh;
+  margin: auto auto 0;
+  padding: 0;
+  border: 0;
+  border-radius: 22px 22px 0 0;
+  background: var(--surface);
+  color: var(--ink);
+  overflow: auto;
+}
+dialog::backdrop { background: rgba(8, 14, 26, .62); }
+dialog[open] { animation: rise .22s ease-out; }
+@keyframes rise { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
+.inner { padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px)); }
+.sheet-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.sheet-top .ball { width: 52px; flex: none; }
+.sheet-top p { margin: 0; color: var(--muted); font-size: 15px; }
+.sheet-top h2 { font-size: 34px; font-weight: 700; line-height: 1; }
+.inner h3 { font-size: 19px; font-weight: 600; color: var(--chalk); margin: 16px 0 2px; }
+.inner p.body { margin: 0; max-width: 60ch; }
+.note {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--cue);
+  background: var(--bg);
+  border-radius: 0 10px 10px 0;
+  font-size: 15px;
+}
+.stepper {
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  gap: 12px;
+  align-items: center;
+  margin: 22px 0 16px;
+}
+.stepper button {
+  height: 64px;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg);
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+}
+.readout { text-align: center; }
+.readout output {
+  display: block;
+  font-family: var(--display);
+  font-size: 58px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.readout span { color: var(--muted); font-size: 15px; }
+.save { width: 100%; min-height: 56px; font-size: 18px; }
+.close-row { text-align: center; margin-top: 8px; }
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 12px 14px;
+  min-height: 48px;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Footer */
+footer { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--muted); font-size: 15px; }
+details summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--ink); font-weight: 700; }
+details p { margin: 4px 0 10px; }
+#storage-note { color: var(--ink); background: var(--surface); border: 1px solid var(--cue); border-radius: 10px; padding: 10px 12px; margin: 0 0 12px; }
+#storage-note[hidden] { display: none; }
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 20px);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 20;
+  max-width: calc(100% - 32px);
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) {
+  dialog[open] { animation: none; }
+  .toast { transition: none; }
+}
+</style>
+</head>
+<body>
+<main>
+  <h1>30-Day Pool Practice</h1>
+  <p class="lede">One drill a day. Score it, then come back tomorrow.</p>
+
+  <div class="stats" id="stats"></div>
+  <div class="next-card" id="next"></div>
+  <div id="rack"></div>
+
+  <footer>
+    <p id="storage-note" hidden>Scores can’t be saved in this browser, so they will clear when you close the page.</p>
+    <details>
+      <summary>Table terms</summary>
+      <p><b>Diamonds</b> are the marked dots on the rails. They are about a foot apart on a 9-foot table. A hand-span is about the same distance.</p>
+      <p><b>Head rail</b> is the short rail at the end you break from. <b>Foot rail</b> is the one at the other end. The <b>head spot</b> and <b>foot spot</b> are the dots a quarter of the way in from each of those rails. The <b>head string</b> is the line across the table through the head spot.</p>
+      <p>These setups work on any table size. Move the balls a little closer together on a smaller table.</p>
+    </details>
+    <button type="button" class="link-btn" id="reset">Reset all scores</button>
+    <p>Scores are saved on this device only.</p>
+  </footer>
+</main>
+
+<dialog id="sheet" aria-labelledby="sheet-title"><div class="inner" id="inner"></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var WEEKS = ['Fundamentals', 'Cutting', 'Position', 'Kicks, banks and safeties', 'Break and pressure'];
+  var COLORS = ['#f2c230', '#2563c9', '#d93a2f', '#6a3fa0', '#f08a24', '#1f9d55', '#8c2a2a', '#1b1b1b'];
+
+  var DRILLS = [
+    // Week 1: Fundamentals
+    { t: 'Stop Shot', max: 10,
+      setup: 'Put an object ball about one diamond from a corner pocket, lined up straight in. Put the cue ball about two diamonds behind it, on the same line.',
+      goal: 'Pocket the ball and stop the cue ball where the object ball was, within a ball-width. Shoot 10 times.',
+      score: '1 point for each shot that is pocketed and stops.' },
+    { t: 'Straight Stroke', max: 10,
+      setup: 'Put the cue ball on the head spot. No object ball: hit the cue ball straight up the middle of the table to the foot rail and back.',
+      goal: 'Bring the cue ball back to your tip. Shoot 10 times.',
+      score: '1 point each time it stops within a hand-span of your tip.' },
+    { t: 'Follow Shot', max: 10,
+      setup: 'Put an object ball about three diamonds from a corner pocket, lined up straight in. Put the cue ball about two diamonds behind it.',
+      goal: 'Pocket the ball and roll the cue ball forward about one diamond past the contact point, staying short of the pocket. Shoot 10 times.',
+      score: '1 point for each shot that is pocketed with the cue ball rolling forward and not scratching.' },
+    { t: 'Draw Shot', max: 10,
+      setup: 'Put an object ball about two diamonds from a corner pocket, lined up straight in. Put the cue ball about two diamonds behind it.',
+      goal: 'Pocket the ball and pull the cue ball back at least one diamond toward you. Shoot 10 times.',
+      score: '1 point for each shot that is pocketed and draws back.' },
+    { t: 'Long Stop Shot', max: 10,
+      setup: 'Same as the stop shot, but put the cue ball about four diamonds behind the object ball.',
+      goal: 'Pocket the ball and stop the cue ball where the object ball was, within a ball-width. Shoot 10 times.',
+      score: '1 point for each shot that is pocketed and stops.' },
+    { t: 'Lag', max: 10,
+      setup: 'Put the cue ball on the head string. No object ball: hit it to the foot rail and back, trying to stop it as close to the head rail as you can.',
+      goal: 'Control your speed. Shoot 5 times.',
+      score: '2 points if it stops within one diamond of the head rail. 1 point if within two diamonds. 0 points otherwise.' },
+
+    // Week 2: Cutting
+    { t: 'Half-Ball Cut', max: 10,
+      setup: 'Put the object ball in the middle of the table, straight across from the side pockets. Put the cue ball on the head spot.',
+      goal: 'Pocket the object ball in a foot corner pocket. Shoot 5 times at the right-hand pocket and 5 times at the left-hand pocket.',
+      score: '1 point for each ball pocketed.' },
+    { t: 'Slight Cut', max: 10,
+      setup: 'Put the object ball about two diamonds from a corner pocket. Put the cue ball about a ball-width off the straight line, so you only need a small angle.',
+      goal: 'Pocket the ball. Shoot 5 times from each side of the straight line.',
+      score: '1 point for each ball pocketed.' },
+    { t: 'Thin Cut', max: 10,
+      setup: 'Put the object ball about two diamonds from a corner pocket. Put the cue ball off to one side so you only hit about a quarter of the ball.',
+      goal: 'Pocket the ball. Shoot 5 times from each side.',
+      score: '1 point for each ball pocketed.' },
+    { t: 'Alternating Cuts', max: 10,
+      setup: 'Use the half-ball cut setup. Shoot one cut to the right-hand foot corner, then reset and shoot one to the left-hand foot corner. Keep alternating.',
+      goal: 'Switch sides every shot without changing your routine. Shoot 10 times.',
+      score: '1 point for each ball pocketed.' },
+    { t: 'Cut and Follow', max: 10,
+      setup: 'Use the half-ball cut setup.',
+      goal: 'Pocket the ball with follow, so the cue ball keeps rolling forward after contact. Shoot 10 times.',
+      score: '1 point for each ball pocketed without a scratch.' },
+    { t: 'Cut and Draw', max: 10,
+      setup: 'Use the half-ball cut setup.',
+      goal: 'Pocket the ball with draw, so the cue ball pulls back after contact. Shoot 10 times.',
+      score: '1 point for each ball pocketed with the cue ball pulling back.' },
+
+    // Week 3: Position
+    { t: 'Stop-Shot Ladder', max: 12,
+      setup: 'Put an object ball about one diamond from a corner pocket, lined up straight in. Start with the cue ball one diamond behind it.',
+      goal: 'Pocket the ball and stop the cue ball. Then move the cue ball back to two, three and four diamonds. That is one round. Do three rounds.',
+      score: '1 point for each shot that is pocketed and stops.' },
+    { t: 'Two-Ball Run', max: 5,
+      setup: 'Scatter two object balls on the table, away from the rails. Place the cue ball anywhere (ball in hand).',
+      goal: 'Pocket both balls, one after the other. Try 5 times.',
+      score: '1 point for each time you pocket both.' },
+    { t: 'Three-Ball Run', max: 5,
+      setup: 'Scatter three object balls on the table, away from the rails. Place the cue ball anywhere (ball in hand).',
+      goal: 'Pocket all three balls, one after the other. Try 5 times.',
+      score: '1 point for each time you pocket all three.' },
+    { t: 'Four-Ball Run', max: 5,
+      setup: 'Scatter four object balls on the table, away from the rails. Place the cue ball anywhere (ball in hand).',
+      goal: 'Pocket all four balls, one after the other. Try 5 times.',
+      score: '1 point for each time you pocket all four.' },
+    { t: 'Middle Third', max: 10,
+      setup: 'Use the half-ball cut setup. Picture the table split into three equal sections, end to end.',
+      goal: 'Pocket the ball and leave the cue ball in the middle section. Shoot 10 times.',
+      score: '1 point for each ball pocketed with the cue ball finishing in the middle section.' },
+    { t: 'Five-Ball Run', max: 5,
+      setup: 'Scatter five object balls on the table, away from the rails. Place the cue ball anywhere (ball in hand).',
+      goal: 'Pocket all five balls, one after the other. Try 5 times.',
+      score: '1 point for each time you pocket all five.' },
+
+    // Week 4: Kicks, banks and safeties
+    { t: 'One-Rail Kick', max: 10,
+      setup: 'Put an object ball on the foot spot. Put the cue ball anywhere behind the head string.',
+      goal: 'Hit the object ball by sending the cue ball off one long rail first. Shoot 10 times.',
+      score: '1 point for each shot where the cue ball hits the object ball after one rail.' },
+    { t: 'Two-Rail Kick', max: 10,
+      setup: 'Put an object ball on the foot spot. Put the cue ball anywhere behind the head string.',
+      goal: 'Hit the object ball after the cue ball touches two rails first. Shoot 10 times.',
+      score: '1 point for each shot where the cue ball hits the object ball after two rails.' },
+    { t: 'Cross-Corner Bank', max: 10,
+      setup: 'Put an object ball near a long rail, a couple of diamonds from the side pocket. Put the cue ball behind it.',
+      goal: 'Bank the ball across the table off the opposite long rail and into a corner pocket. Shoot 10 times.',
+      score: '1 point for each ball pocketed.' },
+    { t: 'Cross-Side Bank', max: 10,
+      setup: 'Put an object ball near a long rail, a couple of diamonds from a corner pocket. Put the cue ball behind it.',
+      goal: 'Bank the ball across the table off the opposite long rail and into the side pocket on the side it started. Shoot 10 times.',
+      score: '1 point for each ball pocketed.' },
+    { t: 'Safety to the Rail', max: 10,
+      setup: 'Put an object ball in the middle of the table. Put the cue ball anywhere.',
+      goal: 'Hit the object ball so it finishes within one diamond of a rail. Shoot 10 times.',
+      score: '1 point for each shot that leaves the object ball within one diamond of a rail.' },
+    { t: 'Hide the Cue Ball', max: 5,
+      setup: 'Put one ball in the middle of the table and another near the foot rail. Put the cue ball anywhere.',
+      goal: 'Hit the foot-rail ball and leave the cue ball behind the middle ball, so there is no straight path to the foot-rail ball. Shoot 5 times.',
+      score: '1 point for each shot that leaves the cue ball with no straight path.' },
+
+    // Week 5: Break and pressure
+    { t: 'Break Control', max: 10,
+      setup: 'Rack nine balls in a diamond. Put the cue ball behind the head string.',
+      goal: 'Break so a ball drops, the cue ball stays on the table, and it finishes in the middle third of the table. Break 10 times.',
+      score: '1 point for each break that pockets a ball, does not scratch, and leaves the cue ball in the middle third.' },
+    { t: 'Run the Rack', max: 9,
+      setup: 'Rack nine balls, break, and try to run the table in order, lowest number first.',
+      goal: 'Pocket as many balls in a row as you can in one rack.',
+      score: '1 point for each ball pocketed in order, up to 9.' },
+    { t: 'Straight-In Streak', max: 10,
+      setup: 'Use the stop shot setup.',
+      goal: 'Make as many straight-in shots in a row as you can, up to 10. Stop at your first miss.',
+      score: '1 point for each ball in your streak.' },
+    { t: 'Cut Countdown', max: 10,
+      setup: 'Use the half-ball cut setup. You start with 10 points.',
+      goal: 'Make 5 cut shots in a row. Each miss costs you 1 point and your run of 5 starts over. Stop when you make 5 in a row or reach 0 points.',
+      score: 'The points you have left when you finish.' },
+    { t: 'Mixed Test', max: 10,
+      setup: 'Take one shot at each of these: stop shot, follow shot, draw shot, half-ball cut, thin cut, two-ball run, one-rail kick, bank shot, safety to the rail, and a break.',
+      goal: 'Try each one one time.',
+      score: '1 point for each success. Count the two-ball run only if you clear both balls.' },
+    { t: 'Final Check', max: 10,
+      setup: 'Repeat Day 1: object ball about one diamond from a corner pocket, lined up straight in, with the cue ball two diamonds behind it.',
+      goal: 'Pocket the ball and stop the cue ball. Shoot 10 times, then compare with your Day 1 score.',
+      score: '1 point for each shot that is pocketed and stops.' }
+  ];
+
+  var KEY = 'pool-drills-v1';
+  var store = { scores: {}, dates: {} };
+  var storageOk = true;
+
+  function load() {
+    try {
+      var raw = window.localStorage.getItem(KEY);
+      if (raw) {
+        var p = JSON.parse(raw);
+        if (p && p.scores && p.dates) { store = p; }
+      }
+    } catch (e) { storageOk = false; }
+  }
+  function persist() {
+    try { window.localStorage.setItem(KEY, JSON.stringify(store)); }
+    catch (e) { storageOk = false; }
+    renderNote();
+  }
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function dayKey(dt) { return dt.getFullYear() + '-' + pad(dt.getMonth() + 1) + '-' + pad(dt.getDate()); }
+  function isDone(d) { return typeof store.scores[d] === 'number'; }
+
+  function nextDay() {
+    for (var d = 1; d <= DRILLS.length; d++) { if (!isDone(d)) { return d; } }
+    return 0;
+  }
+  function streak() {
+    var set = {};
+    Object.keys(store.dates).forEach(function (k) { set[store.dates[k]] = true; });
+    var dt = new Date();
+    dt.setHours(12, 0, 0, 0);
+    if (!set[dayKey(dt)]) { dt.setDate(dt.getDate() - 1); }
+    var n = 0;
+    while (set[dayKey(dt)]) { n++; dt.setDate(dt.getDate() - 1); }
+    return n;
+  }
+
+  function ballHTML(d, done) {
+    var k = ((d - 1) % 15) + 1;
+    var stripe = k >= 9;
+    var col = COLORS[stripe ? k - 9 : k - 1];
+    return '<span class="ball' + (stripe ? ' stripe' : '') + (done ? '' : ' todo') + '" style="--c:' + col + '"><span class="num">' + d + '</span></span>';
+  }
+
+  var statsEl = document.getElementById('stats');
+  var nextEl = document.getElementById('next');
+  var rackEl = document.getElementById('rack');
+  var sheet = document.getElementById('sheet');
+  var inner = document.getElementById('inner');
+  var toastEl = document.getElementById('toast');
+  var noteEl = document.getElementById('storage-note');
+  var resetBtn = document.getElementById('reset');
+
+  function renderStats() {
+    var done = 0, total = 0, maxTotal = 0;
+    DRILLS.forEach(function (dr, i) {
+      maxTotal += dr.max;
+      if (isDone(i + 1)) { done++; total += store.scores[i + 1]; }
+    });
+    var s = streak();
+    statsEl.innerHTML =
+      '<div class="stat"><b>' + done + ' of ' + DRILLS.length + '</b><span>drills done</span></div>' +
+      '<div class="stat"><b>' + total + '</b><span>of ' + maxTotal + ' points</span></div>' +
+      '<div class="stat"><b>' + s + '</b><span>' + (s === 1 ? 'day in a row' : 'days in a row') + '</span></div>';
+  }
+
+  function renderNext() {
+    var n = nextDay();
+    if (n) {
+      nextEl.innerHTML =
+        '<div><p class="next-label">Next up: Day ' + n + '</p><h2 class="next-title">' + DRILLS[n - 1].t + '</h2></div>' +
+        '<button type="button" class="primary" data-day="' + n + '">Open drill</button>';
+    } else {
+      nextEl.innerHTML =
+        '<div><p class="next-label">All 30 days done</p><h2 class="next-title">Tap any ball to beat your score</h2></div>';
+    }
+  }
+
+  function renderRack() {
+    var next = nextDay();
+    var html = '';
+    for (var w = 0; w < 5; w++) {
+      var doneCount = 0, cells = '';
+      for (var i = 0; i < 6; i++) {
+        var d = w * 6 + i + 1;
+        var dr = DRILLS[d - 1];
+        var done = isDone(d);
+        if (done) { doneCount++; }
+        var label = 'Day ' + d + ': ' + dr.t + (done ? ', done, scored ' + store.scores[d] + ' of ' + dr.max : ', not done');
+        cells += '<button type="button" class="cell' + (d === next ? ' next' : '') + '" data-day="' + d + '" aria-label="' + label + '">' +
+          ballHTML(d, done) + '<span class="cap">' + (done ? store.scores[d] + '/' + dr.max : '') + '</span></button>';
+      }
+      html += '<section class="week"><div class="week-head"><h2>Week ' + (w + 1) + ': ' + WEEKS[w] + '</h2><span class="week-count">' + doneCount + ' of 6 done</span></div><div class="rack">' + cells + '</div></section>';
+    }
+    rackEl.innerHTML = html;
+  }
+
+  function renderNote() { noteEl.hidden = storageOk; }
+  function renderAll() { renderStats(); renderNext(); renderRack(); renderNote(); }
+
+  var toastTimer = 0;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2600);
+  }
+
+  var current = 0, value = 0;
+
+  function openSheet(d) {
+    current = d;
+    var dr = DRILLS[d - 1];
+    var prev = store.scores[d];
+    value = typeof prev === 'number' ? prev : 0;
+    var w = Math.floor((d - 1) / 6);
+    var notes = '';
+    if (d === 30 && isDone(1)) {
+      notes += '<p class="note">Your Day 1 score was ' + store.scores[1] + ' of ' + DRILLS[0].max + '.</p>';
+    }
+    if (typeof prev === 'number') {
+      notes += '<p class="note">Saved score: ' + prev + ' of ' + dr.max + '. Saving again replaces it.</p>';
+    }
+    inner.innerHTML =
+      '<div class="sheet-top">' + ballHTML(d, true) +
+        '<div><p>Day ' + d + ' of 30, ' + WEEKS[w] + '</p><h2 id="sheet-title">' + dr.t + '</h2></div></div>' +
+      '<h3>Setup</h3><p class="body">' + dr.setup + '</p>' +
+      '<h3>Goal</h3><p class="body">' + dr.goal + '</p>' +
+      '<h3>How to score</h3><p class="body">' + dr.score + '</p>' +
+      notes +
+      '<div class="stepper">' +
+        '<button type="button" data-act="minus" aria-label="Lower score by 1">−</button>' +
+        '<div class="readout"><output id="val" for="minus plus">' + value + '</output><span>of ' + dr.max + ' points</span></div>' +
+        '<button type="button" data-act="plus" aria-label="Raise score by 1">+</button>' +
+      '</div>' +
+      '<button type="button" class="primary save" data-act="save">Save score</button>' +
+      '<div class="close-row"><button type="button" class="link-btn" data-act="close">Close</button></div>';
+    if (typeof sheet.showModal === 'function') { sheet.showModal(); } else { sheet.setAttribute('open', ''); }
+  }
+
+  function setValue(v) {
+    var max = DRILLS[current - 1].max;
+    value = Math.max(0, Math.min(max, v));
+    document.getElementById('val').textContent = value;
+  }
+
+  inner.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-act]');
+    if (!btn) { return; }
+    var act = btn.getAttribute('data-act');
+    if (act === 'minus') { setValue(value - 1); }
+    else if (act === 'plus') { setValue(value + 1); }
+    else if (act === 'close') { sheet.close(); }
+    else if (act === 'save') {
+      store.scores[current] = value;
+      store.dates[current] = dayKey(new Date());
+      persist();
+      renderAll();
+      sheet.close();
+      toast('Day ' + current + ' saved: ' + value + ' of ' + DRILLS[current - 1].max);
+    }
+  });
+
+  sheet.addEventListener('click', function (e) { if (e.target === sheet) { sheet.close(); } });
+
+  function onOpen(e) {
+    var el = e.target.closest('[data-day]');
+    if (el) { openSheet(parseInt(el.getAttribute('data-day'), 10)); }
+  }
+  rackEl.addEventListener('click', onOpen);
+  nextEl.addEventListener('click', onOpen);
+
+  var resetTimer = 0;
+  resetBtn.addEventListener('click', function () {
+    if (resetBtn.getAttribute('data-armed') === '1') {
+      store = { scores: {}, dates: {} };
+      persist();
+      renderAll();
+      resetBtn.removeAttribute('data-armed');
+      resetBtn.textContent = 'Reset all scores';
+      toast('All scores cleared');
+    } else {
+      resetBtn.setAttribute('data-armed', '1');
+      resetBtn.textContent = 'Tap again to erase all scores';
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(function () {
+        resetBtn.removeAttribute('data-armed');
+        resetBtn.textContent = 'Reset all scores';
+      }, 4000);
+    }
+  });
+
+  load();
+  renderAll();
+})();
+</script>
+</body>
+</html>
