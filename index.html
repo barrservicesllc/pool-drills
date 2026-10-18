@@ -1412,6 +1412,7 @@ a.pbtn { display: inline-flex; align-items: center; justify-content: center; tex
     endDate: '2027-01-01',
     drawDate: '2027-01-04',
     timeZone: 'Eastern Time',
+    altEntry: true,                // free email entry for people who skip the drills
     eligibility: 'Legal residents of the United States who are 18 years or older, except where prohibited by law.',
     daysPerEntry: 6,
     maxEntries: 5
@@ -1458,6 +1459,15 @@ a.pbtn { display: inline-flex; align-items: center; justify-content: center; tex
     var body = 'Name:\nEmail:\nState:\nI am 18 or older and have read the Official Rules.\n\nEntry code: ' + code + '\nDays counted: ' + st.days + '\nEntries: ' + st.entries + '\n';
     return 'mailto:' + GIVEAWAY.contactEmail + '?subject=' + encodeURIComponent('Pool drills giveaway entry ' + code) + '&body=' + encodeURIComponent(body);
   }
+  function altHref() {
+    if (GIVEAWAY.entryFormUrl) { return GIVEAWAY.entryFormUrl; }
+    var body = 'Name:\nEmail:\nState:\nI am 18 or older and have read the Official Rules.\n\nSuggestion for the app (optional):\n';
+    return 'mailto:' + GIVEAWAY.contactEmail + '?subject=' + encodeURIComponent('Giveaway entry') + '&body=' + encodeURIComponent(body);
+  }
+  function ideaHref() {
+    if (!GIVEAWAY.contactEmail) { return ''; }
+    return 'mailto:' + GIVEAWAY.contactEmail + '?subject=' + encodeURIComponent('Pool guide idea') + '&body=' + encodeURIComponent('My idea for the app:\n');
+  }
   function giveRulesHTML() {
     var G = GIVEAWAY, per = G.daysPerEntry, max = G.maxEntries;
     var contact = G.contactEmail ? esc(G.contactEmail) : 'the entry form';
@@ -1467,6 +1477,7 @@ a.pbtn { display: inline-flex; align-items: center; justify-content: center; tex
       ['Who can enter', esc(G.eligibility) + ' The sponsor’s employees and their households cannot enter.'],
       ['Entry period', 'From ' + fmt(G.startDate) + ' through ' + fmt(G.endDate) + ', 11:59 p.m. ' + esc(G.timeZone) + '.'],
       ['How to enter', 'Complete drills in this guide and save your score for each one. Each calendar day on which you save at least one drill counts as one day, no matter how many drills you save that day. Every ' + per + ' counted days earns one entry, up to ' + max + ' entries per person. Scores are self-reported. Send your entries from the Giveaway tab before the entry period ends. One person per entry. Scripts, automated tools and other attempts to tamper with the process are not allowed, and the sponsor may remove any entry it believes is not genuine.'],
+      ['Free alternate entry', G.altEntry ? 'You can also enter without using the drills. Send an email to ' + contact + ' with the subject Giveaway entry, with your name, email address and state, and say that you are 18 or older. That earns one entry. Limit one alternate entry per person, and it counts toward the limit of ' + max + ' entries per person. A suggestion for the app is welcome but is not required and does not change your odds.' : 'There is no alternate entry method.'],
       ['The drawing', 'One winner is chosen at random from all eligible entries on or about ' + fmt(G.drawDate) + '. Your odds depend on how many eligible entries are received.'],
       ['Prize', 'One ' + esc(G.prize) + ', approximate retail value ' + esc(G.prizeValue) + '. No cash or substitute. The sponsor pays standard shipping to a U.S. address. The winner pays any taxes on the prize.'],
       ['Winner', 'The winner is contacted by email and has 7 days to reply. If there is no reply, the sponsor may choose another winner. To ask for the winner’s name, write to ' + contact + ' after the drawing.'],
@@ -1500,12 +1511,14 @@ a.pbtn { display: inline-flex; align-items: center; justify-content: center; tex
       '<div class="gcard" style="margin-top:14px"><h2>Win a ' + esc(G.prize) + '</h2><p class="muted">Approximate retail value ' + esc(G.prizeValue) + '. Free to enter.</p></div>' +
       '<div class="gcard"><h2>Your entries</h2><div class="meter" aria-hidden="true">' + segs + '</div>' +
         '<p><b>' + st.entries + ' of ' + G.maxEntries + ' entries.</b> ' + st.days + ' ' + (st.days === 1 ? 'day' : 'days') + ' counted. ' + note + '</p>' + send + '</div>' +
+      (ws === 'open' && G.altEntry ? '<div class="gcard"><h2>No drills? Enter by email</h2><p>One free entry per person. Send your name, email and state, and say you are 18 or older. A suggestion for the app is welcome, but you do not have to give one.</p><a class="pbtn alt" href="' + esc(altHref()) + '"' + (G.entryFormUrl ? ' target="_blank" rel="noopener"' : '') + '>Enter by email</a></div>' : '') +
       '<div class="gcard"><h2>How to enter</h2><ol class="gsteps">' +
         '<li>Do a drill and save your score on the Drills tab.</li>' +
         '<li>Each day with at least one saved drill counts as one day. Doing several drills in one day still counts as one.</li>' +
         '<li>Every ' + G.daysPerEntry + ' counted days earns one entry, up to ' + G.maxEntries + ' entries.</li>' +
         '<li>Send your entries before ' + esc(fmt(G.endDate)) + '. One winner is picked at random on ' + esc(fmt(G.drawDate)) + '.</li></ol>' +
         '<p class="fine">Scores are self-reported. One person per entry.</p></div>' +
+      (ideaHref() ? '<p class="fine">Have an idea for the app? <a href="' + esc(ideaHref()) + '" style="color:var(--chalk);font-weight:700">Send a suggestion</a>. It does not affect your entry.</p>' : '') +
       '<details class="rule"><summary>Official rules</summary><div class="rbody">' + giveRulesHTML() + '</div></details>';
   }
   function renderTeaser() {
