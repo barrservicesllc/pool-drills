@@ -58,7 +58,7 @@ body {
   line-height: 1.5;
   -webkit-text-size-adjust: 100%;
 }
-main { max-width: 520px; margin: 0 auto; padding: 20px 16px 48px; }
+main { max-width: 520px; margin: 0 auto; padding: 20px 16px calc(96px + env(safe-area-inset-bottom, 0px)); }
 h1, h2, h3 { font-family: var(--display); margin: 0; }
 button { font: inherit; color: inherit; }
 
@@ -289,7 +289,7 @@ details p { margin: 4px 0 10px; }
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   transform: translate(-50%, 20px);
   background: var(--ink);
   color: var(--bg);
@@ -304,6 +304,141 @@ details p { margin: 4px 0 10px; }
   text-align: center;
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* Tabs */
+.view[hidden] { display: none; }
+.tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 10;
+}
+.tabs button {
+  min-height: 58px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+.tabs button[aria-current="page"] { color: var(--chalk); box-shadow: inset 0 3px 0 var(--chalk); }
+.tabs button:focus-visible { outline: 3px solid var(--cue); outline-offset: -3px; }
+
+/* Rules */
+.rsec { margin: 28px 0 10px; font-size: 28px; font-weight: 700; line-height: 1.1; }
+details.rule { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin: 0 0 10px; }
+details.rule > summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: 56px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--display);
+  font-size: 25px;
+  font-weight: 600;
+  color: var(--ink);
+}
+details.rule > summary::-webkit-details-marker { display: none; }
+details.rule > summary::after { content: "+"; font-size: 28px; color: var(--chalk); }
+details.rule[open] > summary::after { content: "\2212"; }
+.rbody { padding: 0 16px 16px; }
+.rbody h4 { margin: 14px 0 4px; font-family: var(--display); font-size: 19px; font-weight: 600; color: var(--chalk); }
+.rbody ul { margin: 0; padding-left: 20px; }
+.rbody li { margin: 0 0 7px; max-width: 62ch; }
+.rbody .pbtn { margin-top: 14px; }
+.src a { color: var(--chalk); font-weight: 700; }
+.src li { margin-bottom: 10px; }
+
+/* Score sheets */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.chips button {
+  min-height: 46px;
+  padding: 0 16px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-weight: 700;
+  cursor: pointer;
+}
+.chips button[aria-pressed="true"] { background: var(--chalk); color: var(--on-chalk); border-color: var(--chalk); }
+.names { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 12px; }
+.names label { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+.names input, .tgt input {
+  min-height: 48px;
+  padding: 0 12px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  width: 100%;
+}
+.tgt { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; color: var(--muted); }
+.tgt input { width: 92px; }
+.pcards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pcard { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; padding: 14px 10px; text-align: center; }
+.pcard.turn { border-color: var(--cue); }
+.pcard.won { border-color: var(--chalk); box-shadow: inset 0 0 0 2px var(--chalk); }
+.pcard h3 { font-size: 22px; font-weight: 600; overflow-wrap: anywhere; }
+.big { font-family: var(--display); font-size: 66px; font-weight: 700; line-height: 1; margin: 6px 0; font-variant-numeric: tabular-nums; }
+.pbtn {
+  min-height: 52px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--chalk);
+  color: var(--on-chalk);
+  font-weight: 700;
+  cursor: pointer;
+}
+.pbtn.alt { background: var(--surface); color: var(--ink); border: 2px solid var(--line); }
+.pbtn:disabled { opacity: .4; cursor: default; }
+.pbtn:focus-visible, .chips button:focus-visible, .mini button:focus-visible { outline: 3px solid var(--cue); outline-offset: 2px; }
+.pcard .pbtn { width: 100%; margin-top: 6px; }
+.btnrow, .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions { margin-top: 20px; }
+.panel { margin: 12px 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.panel p { margin: 0 0 8px; }
+.banner { margin: 14px 0 0; padding: 12px; background: var(--chalk); color: var(--on-chalk); border-radius: 12px; font-weight: 700; text-align: center; }
+.muted { color: var(--muted); font-size: 15px; margin: 4px 0 0; }
+h3.sub { font-size: 21px; font-weight: 600; margin: 18px 0 6px; }
+.log { margin: 0; padding-left: 24px; }
+table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.turns th, .turns td { text-align: left; padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.drow { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px; margin: 0 0 10px; display: grid; gap: 8px; }
+.drow select { min-height: 48px; border: 2px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--ink); font: inherit; padding: 0 8px; width: 100%; }
+.dline { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dcell { display: grid; gap: 4px; }
+.dcell > span { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.mini { display: grid; grid-template-columns: 48px 1fr 48px; gap: 6px; align-items: center; }
+.mini button { height: 48px; border: 2px solid var(--line); border-radius: 12px; background: var(--bg); font-size: 24px; line-height: 1; cursor: pointer; }
+.mini output { text-align: center; font-family: var(--display); font-size: 32px; font-weight: 700; }
+.dwin { font-weight: 700; color: var(--chalk); min-height: 1.4em; }
+.ladder { list-style: none; margin: 8px 0; padding: 0; text-align: left; }
+.ladder li { padding: 6px 8px; border-radius: 8px; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+.ladder li span { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--line); font-weight: 700; font-size: 13px; }
+.ladder li.passed { opacity: .5; text-decoration: line-through; }
+.ladder li.here { background: var(--bg); outline: 2px solid var(--cue); }
+.ladder li.here span { background: var(--cue); color: #111; }
+.print-head { display: none; }
+@media print {
+  body { background: #fff; color: #000; }
+  main { padding: 0; max-width: none; }
+  .tabs, .no-print, .chips, .actions, .names, .tgt, .pbtn, .mini button, details.rule, .toast { display: none !important; }
+  .print-head { display: flex; justify-content: space-between; border-bottom: 2px solid #000; margin-bottom: 12px; font-size: 18px; }
+  .pcard, .drow, .panel { border: 1px solid #000; background: #fff; color: #000; }
+  .banner { background: #fff; color: #000; border: 2px solid #000; }
+  .big, .muted, .dwin { color: #000; }
+}
 @media (prefers-reduced-motion: reduce) {
   dialog[open] { animation: none; }
   .toast { transition: none; }
@@ -312,6 +447,7 @@ details p { margin: 4px 0 10px; }
 </head>
 <body>
 <main>
+  <section id="view-drills" class="view">
   <h1>30-Day Pool Practice</h1>
   <p class="lede">One drill a day. Score it, then come back tomorrow.</p>
 
@@ -330,7 +466,16 @@ details p { margin: 4px 0 10px; }
     <button type="button" class="link-btn" id="reset">Reset all scores</button>
     <p>Scores are saved on this device only.</p>
   </footer>
+  </section>
+  <section id="view-rules" class="view" hidden></section>
+  <section id="view-score" class="view" hidden></section>
 </main>
+
+<nav class="tabs" aria-label="Sections">
+  <button type="button" data-tab="drills" aria-current="page">Drills</button>
+  <button type="button" data-tab="rules" aria-current="false">Rules</button>
+  <button type="button" data-tab="score" aria-current="false">Score sheets</button>
+</nav>
 
 <dialog id="sheet" aria-labelledby="sheet-title"><div class="inner" id="inner"></div></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -619,6 +764,8 @@ details p { margin: 4px 0 10px; }
       tableBase(id) + under + rings + lines + balls + texts + '</svg>';
   }
 
+  window.PoolData = { DRILLS: DRILLS };
+
   var KEY = 'pool-drills-v1';
   var store = { scores: {}, dates: {} };
   var storageOk = true;
@@ -817,6 +964,438 @@ details p { margin: 4px 0 10px; }
 
   load();
   renderAll();
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var DRILLS = (window.PoolData && window.PoolData.DRILLS) || [];
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  /* ---------- Rules content (our own words) ---------- */
+  var RULES = [
+    { section: 'The basics', entries: [
+      { title: 'Shots, fouls and ball in hand', groups: [
+        { h: '', items: [
+          'The official rules of pool are the World Standardized Rules from the World Pool-Billiard Association (WPA). The Billiard Congress of America publishes them too, and most pro events use them.',
+          'Leagues and bars change small things, so ask which rules you are playing before the first break.',
+          'A legal shot: the cue ball hits a legal object ball first. After that, a ball must be pocketed or any ball must touch a rail.',
+          'After a foul, the next player has ball in hand and can put the cue ball anywhere on the table.',
+          'Common fouls: pocketing the cue ball (a scratch), driving the cue ball off the table, hitting the wrong ball first, no ball touching a rail after contact, and playing out of turn.',
+          'A ball driven off the table stays off, except the 9-ball in nine-ball, which goes back on the table.'
+        ] }
+      ] }
+    ] },
+    { section: 'Official games', entries: [
+      { title: '8-Ball', groups: [
+        { h: 'Setup', items: [
+          'Cue ball plus 15 object balls: seven solids (1 to 7), seven stripes (9 to 15) and the 8-ball.',
+          'Rack in a triangle with the lead ball on the foot spot and the 8-ball in the center.'
+        ] },
+        { h: 'Break', items: [
+          'The breaker shoots from behind the head string. Most rules require a ball to be pocketed or at least four balls to reach a rail.',
+          'Rules differ on pocketing the 8 on the break. In APA it wins the game unless you also scratch. Other rule sets re-rack or put the 8 back on the table.'
+        ] },
+        { h: 'Play', items: [
+          'The table is open after the break. Until someone legally pockets a called ball, you may hit any ball except the 8 first. The group of that pocketed ball (solids or stripes) becomes that player’s group.',
+          'Call the ball and the pocket for each shot unless it is obvious. If the called ball does not go in, your turn ends.',
+          'Other balls that drop on a shot stay pocketed. Some leagues change this.'
+        ] },
+        { h: 'Winning', items: [
+          'After you clear your group, call the 8-ball and pocket it.',
+          'You lose the game if you pocket the 8 early, in a pocket you did not call, or off the table, or if you scratch while pocketing it. Missing the 8 without a foul only passes the turn.'
+        ] }
+      ] },
+      { title: '9-Ball', groups: [
+        { h: 'Setup', items: [
+          'Cue ball plus balls 1 to 9. Rack the nine balls in a diamond with the 1 at the front on the foot spot and the 9 in the center.'
+        ] },
+        { h: 'Break', items: [
+          'Cue ball in hand behind the head string. A foul on the break gives the other player ball in hand.',
+          'Pocketing the 9 on a legal break wins the game under most rules. Some events put it back on the table instead.'
+        ] },
+        { h: 'Play', items: [
+          'Every shot must hit the lowest-numbered ball on the table first. You keep shooting while you legally pocket a ball.',
+          'Pocket the 9 on any legal shot to win. WPA rules do not require calling shots, but some leagues require the 9 to be called.',
+          'Push out: on the first shot after a legal break, the shooter may announce a push out. The normal hit and rail rules are suspended for that one shot, and the other player chooses to shoot from there or hand the shot back.'
+        ] },
+        { h: 'Fouls', items: [
+          'Any foul gives the other player ball in hand. If the 9 is pocketed or driven off the table on a foul, it goes back on the table. No other ball is ever put back.',
+          'Three fouls in a row by the same player, with no legal shot in between, loses the game.'
+        ] }
+      ] },
+      { title: '10-Ball', groups: [
+        { h: 'How it differs', items: [
+          'Like nine-ball with one more ball. Rack ten balls in a triangle with the 1 at the front on the foot spot and the 10 in the center.',
+          'Shots are called: name the ball and the pocket. Fouls give ball in hand, a push out is allowed after the break, and three fouls in a row loses the game.',
+          'Pocketing the 10 on the break does not win. It goes back on the table.'
+        ] }
+      ] },
+      { title: 'Straight Pool (14.1)', groups: [
+        { h: 'Play', items: [
+          'All 15 balls are racked in a triangle. You may shoot any ball, whatever its number or color, but you must call the ball and the pocket for every shot.',
+          'Each legally pocketed ball is worth 1 point. Pros play to 150. Casual games use smaller targets such as 50.',
+          'When only one object ball is left on the table, the other 14 are racked again and you keep shooting. The loose ball stays where it is.'
+        ] },
+        { h: 'Break and fouls', items: [
+          'On the opening break you must call a shot or call a safety. A foul on the opening break costs 2 points, and the other player may accept the table or make you break again.',
+          'Any other foul costs 1 point. A third foul in a row costs 15 more, so 16 for that foul.'
+        ] }
+      ] },
+      { title: 'One Pocket', groups: [
+        { h: 'Play', items: [
+          'Fifteen balls in a triangle. Each player owns one of the two corner pockets at the foot end of the table. The breaker usually picks.',
+          'The first player to pocket eight balls in their own pocket wins. Shots are not called.',
+          'Your turn continues while you pocket a ball in your own pocket. A ball that drops in the other player’s pocket counts for them.',
+          'On the break, a ball must reach a rail after the cue ball hits the rack.'
+        ] },
+        { h: 'Fouls', items: [
+          'On a foul or a scratch, any balls pocketed on that shot go back on the table. You also put one of your own pocketed balls back, or owe one if you have none.',
+          'Details such as jumped balls and ball in hand vary by region and room. Agree on them first.'
+        ] }
+      ] }
+    ] },
+    { section: 'League differences', entries: [
+      { title: 'APA, BCAPL, VNEA and the WPA rules', groups: [
+        { h: 'The idea', items: [
+          'The WPA rules are the baseline. League rulebooks change small things, and the changes matter in close matches. Always check the current rulebook for your league.',
+          'Bar rules vary even from room to room.'
+        ] },
+        { h: 'APA', items: [
+          'Handicapped by skill level. In 8-ball, players are rated 2 to 7, and how many games each needs depends on both ratings. A 2 against a 6 plays a race of 2 to 6.',
+          'In 9-ball, players are rated 1 to 9 and play to a point total. Each ball is 1 point and the 9 is 2 points, so a rack is worth 10. A 2 against a 6 plays 19 to 46.',
+          'In 8-ball you must hit the head ball or a second-row ball first on the break, and a slow break is not allowed. Scratching while shooting the 8 loses the game, even if you miss.'
+        ] },
+        { h: 'BCAPL, CSI and USAPL', items: [
+          'A scratch on the break gives the other player ball in hand anywhere on the table.',
+          'Accidentally touching a ball is not a foul unless it could have changed the shot.'
+        ] },
+        { h: 'VNEA', items: [
+          'Has its own rulebook and definitions. Like the WPA rules, jumping any ball off the table is a foul.'
+        ] },
+        { h: 'Ask before you play', items: [
+          'Some leagues only call fouls caused by the cue ball, and others also call fouls involving object balls. Ask which one you are playing.'
+        ] }
+      ] }
+    ] },
+    { section: 'Our custom games', entries: [
+      { title: 'Drill Duel', play: 'duel', groups: [
+        { h: 'For two players', items: [
+          'Pick five drills from the 30. The score sheet starts with Days 1, 7, 13, 19 and 25, but you can change any of them.',
+          'Both players shoot each drill from the same setup and take turns going first. Score each drill the way the drill says.',
+          'The higher score wins the drill. A tie is a draw.',
+          'Win more drills than your opponent to win the duel. If you tie after five, play Day 1 once more with 5 shots each. Most stops wins.'
+        ] }
+      ] },
+      { title: 'Ladder Climb', play: 'ladder', groups: [
+        { h: 'Solo or two players', items: [
+          'Five rungs, each one a shot from the drills: 1 Stop Shot, 2 Half-Ball Cut, 3 Thin Cut, 4 One-Rail Kick, 5 Cross-Corner Bank.',
+          'Everyone starts on rung 1. On your turn you get three tries at the shot for your rung, one after another.',
+          'Pass the shot the way the drill scores it and you climb one rung and get three fresh tries at the next one.',
+          'Miss all three and your turn ends. You drop one rung, but never below rung 1.',
+          'The first player to pass rung 5 wins. Playing solo, count your turns and try to beat your best.'
+        ] }
+      ] }
+    ] }
+  ];
+
+  var RULE_NOTE = 'These summaries are in our own words, not the official text. Rule sets change, so check the current rulebook for your league or event.';
+
+  function rulesHTML() {
+    var out = '<h1>Rules</h1><p class="lede">How the main games are played, plus two games of our own.</p><p class="muted">' + RULE_NOTE + '</p>';
+    RULES.forEach(function (sec) {
+      out += '<h2 class="rsec">' + sec.section + '</h2>';
+      sec.entries.forEach(function (e, i) {
+        out += '<details class="rule"' + (sec.section === 'The basics' ? ' open' : '') + '><summary>' + e.title + '</summary><div class="rbody">';
+        e.groups.forEach(function (g) {
+          if (g.h) { out += '<h4>' + g.h + '</h4>'; }
+          out += '<ul>' + g.items.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>';
+        });
+        if (e.play) { out += '<button type="button" class="pbtn" data-play="' + e.play + '">Open the score sheet</button>'; }
+        out += '</div></details>';
+      });
+    });
+    out += '<h2 class="rsec">Official rulebooks</h2><ul class="src">' +
+      '<li><a href="https://drdavepoolinfo.com/faq/rules/documentation/" target="_blank" rel="noopener">Dr. Dave’s guide to pool rule documents</a>. Links to the WPA rules, APA, BCAPL, VNEA and one-pocket rules.</li>' +
+      '<li><a href="https://www.poolplayers.com" target="_blank" rel="noopener">American Poolplayers Association (APA)</a></li>' +
+      '<li><a href="https://www.wpa-pool.com" target="_blank" rel="noopener">World Pool-Billiard Association (WPA)</a></li></ul>';
+    return out;
+  }
+  function renderRules() { $('view-rules').innerHTML = rulesHTML(); }
+
+  /* ---------- Score sheets ---------- */
+  var GAMES = {
+    eight: { name: '8-Ball', kind: 'race', target: 5, unit: 'Game' },
+    nine: { name: '9-Ball', kind: 'race', target: 7, unit: 'Rack' },
+    one: { name: 'One Pocket', kind: 'ball', target: 8 },
+    straight: { name: 'Straight Pool', kind: 'points', target: 100 },
+    duel: { name: 'Drill Duel', kind: 'duel' },
+    ladder: { name: 'Ladder Climb', kind: 'ladder' }
+  };
+  var ORDER = ['eight', 'nine', 'one', 'straight', 'duel', 'ladder'];
+  var RUNG_DAYS = [1, 7, 9, 19, 21];
+  var SKEY = 'pool-sheets-v1';
+  var S = { game: 'eight', names: ['Player 1', 'Player 2'], d: {} };
+  var hist = {};
+  var armed = false;
+
+  function fresh(g) {
+    var G = GAMES[g];
+    if (G.kind === 'race') { return { target: G.target, wins: [] }; }
+    if (G.kind === 'ball') { return { target: 8, scores: [0, 0] }; }
+    if (G.kind === 'points') { return { target: G.target, scores: [0, 0], shooter: 0, turnPts: 0, run: 0, best: [0, 0], turns: [] }; }
+    if (G.kind === 'duel') { return { rows: [1, 7, 13, 19, 25].map(function (d) { return { d: d, a: null, b: null }; }) }; }
+    return { r: [1, 1], turns: [0, 0] };
+  }
+  function loadS() {
+    try {
+      var raw = window.localStorage.getItem(SKEY);
+      if (raw) {
+        var p = JSON.parse(raw);
+        if (p && p.d && p.names) { S = p; }
+      }
+    } catch (e) { /* storage unavailable */ }
+    if (!GAMES[S.game]) { S.game = 'eight'; }
+    ORDER.forEach(function (g) { if (!S.d[g]) { S.d[g] = fresh(g); } });
+  }
+  function saveS() { try { window.localStorage.setItem(SKEY, JSON.stringify(S)); } catch (e) { /* ignore */ } }
+
+  function snap() {
+    var g = S.game;
+    hist[g] = hist[g] || [];
+    hist[g].push(JSON.stringify(S.d[g]));
+    if (hist[g].length > 60) { hist[g].shift(); }
+  }
+  function undo() {
+    var g = S.game, h = hist[g];
+    if (h && h.length) { S.d[g] = JSON.parse(h.pop()); saveS(); renderScore(); }
+  }
+  function endTurn(d) {
+    d.turns.push({ p: d.shooter, pts: d.turnPts });
+    d.shooter = 1 - d.shooter;
+    d.turnPts = 0;
+    d.run = 0;
+  }
+
+  function targetHTML(d, label) {
+    return '<label class="tgt no-print">' + label + ' <input type="number" inputmode="numeric" min="1" max="999" value="' + d.target + '" data-tgt aria-label="' + label + '"></label>';
+  }
+
+  function raceHTML(d, g) {
+    var w = [0, 0];
+    d.wins.forEach(function (p) { w[p]++; });
+    var win = w[0] >= d.target ? 0 : (w[1] >= d.target ? 1 : -1);
+    var cards = [0, 1].map(function (p) {
+      return '<div class="pcard' + (win === p ? ' won' : '') + '"><h3>' + esc(S.names[p]) + '</h3><div class="big">' + w[p] + '</div>' +
+        '<button type="button" class="pbtn" data-sa="win" data-p="' + p + '"' + (win >= 0 ? ' disabled' : '') + '>+ ' + GAMES[g].unit + '</button></div>';
+    }).join('');
+    var banner = win >= 0
+      ? '<p class="banner">' + esc(S.names[win]) + ' wins ' + w[win] + ' to ' + w[1 - win] + '.</p>'
+      : '<p class="muted">First to ' + d.target + ' wins.</p>';
+    var log = d.wins.length
+      ? '<h3 class="sub">Winner of each game</h3><ol class="log">' + d.wins.map(function (p) { return '<li>' + esc(S.names[p]) + '</li>'; }).join('') + '</ol>'
+      : '';
+    return targetHTML(d, 'Race to') + '<div class="pcards">' + cards + '</div>' + banner + log;
+  }
+
+  function onePocketHTML(d) {
+    var win = d.scores[0] >= d.target ? 0 : (d.scores[1] >= d.target ? 1 : -1);
+    var cards = [0, 1].map(function (p) {
+      var owes = d.scores[p] < 0 ? '<p class="muted">owes ' + (-d.scores[p]) + '</p>' : '';
+      return '<div class="pcard' + (win === p ? ' won' : '') + '"><h3>' + esc(S.names[p]) + '</h3><div class="big">' + d.scores[p] + '</div>' + owes +
+        '<button type="button" class="pbtn" data-sa="obal" data-p="' + p + '"' + (win >= 0 ? ' disabled' : '') + '>+1 ball</button>' +
+        '<button type="button" class="pbtn alt" data-sa="ofoul" data-p="' + p + '"' + (win >= 0 ? ' disabled' : '') + '>Foul, spot one (−1)</button></div>';
+    }).join('');
+    var banner = win >= 0
+      ? '<p class="banner">' + esc(S.names[win]) + ' wins.</p>'
+      : '<p class="muted">First to ' + d.target + ' balls in their own pocket wins. Add a ball to the player whose pocket it dropped in.</p>';
+    return '<div class="pcards">' + cards + '</div>' + banner;
+  }
+
+  function pointsHTML(d) {
+    var win = d.scores[0] >= d.target ? 0 : (d.scores[1] >= d.target ? 1 : -1);
+    var cards = [0, 1].map(function (p) {
+      return '<div class="pcard' + (d.shooter === p && win < 0 ? ' turn' : '') + (win === p ? ' won' : '') + '"><h3>' + esc(S.names[p]) + '</h3>' +
+        '<div class="big">' + d.scores[p] + '</div><p class="muted">High run ' + d.best[p] + '</p></div>';
+    }).join('');
+    var dis = win >= 0 ? ' disabled' : '';
+    var panel = '<div class="panel no-print"><p>At the table: <b>' + esc(S.names[d.shooter]) + '</b>. This turn: ' + d.turnPts + '</p><div class="btnrow">' +
+      '<button type="button" class="pbtn" data-sa="sball"' + dis + '>+1 ball</button>' +
+      '<button type="button" class="pbtn alt" data-sa="sf1"' + dis + '>Foul (−1)</button>' +
+      '<button type="button" class="pbtn alt" data-sa="sf2"' + dis + '>Break foul (−2)</button>' +
+      '<button type="button" class="pbtn alt" data-sa="sf16"' + dis + '>Third foul in a row (−16)</button>' +
+      '<button type="button" class="pbtn alt" data-sa="send"' + dis + '>End turn</button></div></div>';
+    var tot = [0, 0];
+    var rows = d.turns.map(function (t, i) {
+      tot[t.p] += t.pts;
+      return '<tr><td>' + (i + 1) + '</td><td>' + esc(S.names[t.p]) + '</td><td>' + (t.pts > 0 ? '+' : '') + t.pts + '</td><td>' + tot[t.p] + '</td></tr>';
+    }).join('');
+    if (d.turnPts !== 0) {
+      rows += '<tr><td>' + (d.turns.length + 1) + '</td><td>' + esc(S.names[d.shooter]) + '</td><td>' + (d.turnPts > 0 ? '+' : '') + d.turnPts + '</td><td>' + d.scores[d.shooter] + '</td></tr>';
+    }
+    var banner = win >= 0 ? '<p class="banner">' + esc(S.names[win]) + ' wins ' + d.scores[win] + ' to ' + d.scores[1 - win] + '.</p>' : '';
+    var table = rows ? '<h3 class="sub">Turns</h3><table class="turns"><thead><tr><th>#</th><th>Player</th><th>Points</th><th>Total</th></tr></thead><tbody>' + rows + '</tbody></table>' : '';
+    return targetHTML(d, 'Play to') + '<div class="pcards">' + cards + '</div>' + panel + banner + table;
+  }
+
+  function stepper(i, p, v) {
+    return '<div class="mini"><button type="button" data-sa="dm" data-i="' + i + '" data-p="' + p + '" aria-label="Lower score">−</button>' +
+      '<output>' + (v == null ? '–' : v) + '</output>' +
+      '<button type="button" data-sa="dp" data-i="' + i + '" data-p="' + p + '" aria-label="Raise score">+</button></div>';
+  }
+  function duelHTML(d) {
+    var wins = [0, 0], played = 0;
+    var rows = d.rows.map(function (r, i) {
+      var done = r.a != null && r.b != null;
+      var wn = done ? (r.a > r.b ? 0 : (r.b > r.a ? 1 : -1)) : -2;
+      if (done) { played++; }
+      if (wn === 0) { wins[0]++; }
+      if (wn === 1) { wins[1]++; }
+      var opts = DRILLS.map(function (dr, k) { return '<option value="' + (k + 1) + '"' + (r.d === k + 1 ? ' selected' : '') + '>Day ' + (k + 1) + ': ' + esc(dr.t) + '</option>'; }).join('');
+      var res = wn === -2 ? '' : (wn === -1 ? 'Draw' : esc(S.names[wn]) + ' wins the drill');
+      return '<div class="drow"><select data-sel="' + i + '" aria-label="Drill ' + (i + 1) + '">' + opts + '</select>' +
+        '<div class="dline"><div class="dcell"><span>' + esc(S.names[0]) + '</span>' + stepper(i, 0, r.a) + '</div>' +
+        '<div class="dcell"><span>' + esc(S.names[1]) + '</span>' + stepper(i, 1, r.b) + '</div></div>' +
+        '<div class="dwin">' + res + '</div></div>';
+    }).join('');
+    var summary;
+    if (played === d.rows.length && wins[0] !== wins[1]) {
+      var w = wins[0] > wins[1] ? 0 : 1;
+      summary = '<p class="banner">' + esc(S.names[w]) + ' wins the duel, ' + wins[w] + ' drills to ' + wins[1 - w] + '.</p>';
+    } else if (played === d.rows.length) {
+      summary = '<p class="banner">Tied ' + wins[0] + ' to ' + wins[1] + '. Play the Day 1 tiebreaker from the Rules tab.</p>';
+    } else {
+      summary = '<p class="muted">Drills won so far: ' + esc(S.names[0]) + ' ' + wins[0] + ', ' + esc(S.names[1]) + ' ' + wins[1] + '.</p>';
+    }
+    return rows + summary;
+  }
+
+  function ladderHTML(d) {
+    var win = d.r[0] > 5 ? 0 : (d.r[1] > 5 ? 1 : -1);
+    var cards = [0, 1].map(function (p) {
+      var r = d.r[p];
+      var steps = RUNG_DAYS.map(function (day, k) {
+        var n = k + 1;
+        var cls = n < r ? 'passed' : (n === r ? 'here' : '');
+        return '<li class="' + cls + '"><span>' + n + '</span>' + esc(DRILLS[day - 1] ? DRILLS[day - 1].t : 'Drill') + '</li>';
+      }).reverse().join('');
+      var dis = win >= 0 ? ' disabled' : '';
+      return '<div class="pcard' + (win === p ? ' won' : '') + '"><h3>' + esc(S.names[p]) + '</h3><ul class="ladder">' + steps + '</ul>' +
+        '<p class="muted">' + (r > 5 ? 'Cleared all 5 rungs.' : 'On rung ' + r + ' of 5.') + ' Turns used: ' + d.turns[p] + '</p>' +
+        '<button type="button" class="pbtn" data-sa="lup" data-p="' + p + '"' + dis + '>Passed the rung</button>' +
+        '<button type="button" class="pbtn alt" data-sa="ldown" data-p="' + p + '"' + dis + '>Missed all 3</button></div>';
+    }).join('');
+    var banner = win >= 0 ? '<p class="banner">' + esc(S.names[win]) + ' wins in ' + d.turns[win] + ' missed turns.</p>' : '<p class="muted">First to pass rung 5 wins. Each rung gives you three tries.</p>';
+    return '<div class="pcards">' + cards + '</div>' + banner;
+  }
+
+  function renderScore() {
+    var g = S.game, G = GAMES[g], d = S.d[g];
+    var chips = ORDER.map(function (k) { return '<button type="button" data-g="' + k + '" aria-pressed="' + (k === g) + '">' + GAMES[k].name + '</button>'; }).join('');
+    var body = G.kind === 'race' ? raceHTML(d, g) : G.kind === 'ball' ? onePocketHTML(d) : G.kind === 'points' ? pointsHTML(d) : G.kind === 'duel' ? duelHTML(d) : ladderHTML(d);
+    var names = '<div class="names no-print">' + [0, 1].map(function (p) {
+      return '<label>Player ' + (p + 1) + '<input type="text" value="' + esc(S.names[p]) + '" data-name="' + p + '" maxlength="24" autocomplete="off"></label>';
+    }).join('') + '</div>';
+    var canUndo = hist[g] && hist[g].length;
+    armed = false;
+    $('view-score').innerHTML =
+      '<h1 class="no-print">Score sheets</h1><p class="lede no-print">Keep score for a match, then print or save the sheet.</p>' +
+      '<div class="chips no-print" role="group" aria-label="Game">' + chips + '</div>' +
+      '<div class="print-head"><b>' + G.name + ' score sheet</b><span>' + esc(new Date().toLocaleDateString()) + '</span></div>' +
+      names + body +
+      '<div class="actions no-print"><button type="button" class="pbtn alt" id="undo"' + (canUndo ? '' : ' disabled') + '>Undo</button>' +
+      '<button type="button" class="pbtn alt" id="print">Print sheet</button>' +
+      '<button type="button" class="pbtn alt" id="newsheet">New sheet</button></div>' +
+      '<p class="muted no-print">Scores save on this device.</p>';
+  }
+
+  function act(a, el) {
+    var g = S.game, d = S.d[g];
+    var p = parseInt(el.getAttribute('data-p'), 10), i = parseInt(el.getAttribute('data-i'), 10);
+    snap();
+    if (a === 'win') { d.wins.push(p); }
+    else if (a === 'obal') { d.scores[p] += 1; }
+    else if (a === 'ofoul') { d.scores[p] -= 1; }
+    else if (a === 'sball') { d.scores[d.shooter] += 1; d.turnPts += 1; d.run += 1; d.best[d.shooter] = Math.max(d.best[d.shooter], d.run); }
+    else if (a === 'sf1' || a === 'sf2' || a === 'sf16') {
+      var n = a === 'sf1' ? 1 : (a === 'sf2' ? 2 : 16);
+      d.scores[d.shooter] -= n; d.turnPts -= n; endTurn(d);
+    }
+    else if (a === 'send') { endTurn(d); }
+    else if (a === 'dm' || a === 'dp') {
+      var r = d.rows[i], key = p === 0 ? 'a' : 'b';
+      var max = DRILLS[r.d - 1] ? DRILLS[r.d - 1].max : 99, cur = r[key];
+      r[key] = a === 'dp' ? Math.min(max, (cur == null ? 0 : cur) + 1) : Math.max(0, (cur == null ? 1 : cur) - 1);
+    }
+    else if (a === 'lup') { d.r[p] = Math.min(6, d.r[p] + 1); }
+    else if (a === 'ldown') { d.r[p] = Math.max(1, d.r[p] - 1); d.turns[p] += 1; }
+    saveS();
+    renderScore();
+  }
+
+  var scoreEl = $('view-score');
+  scoreEl.addEventListener('click', function (e) {
+    var t = e.target;
+    var chip = t.closest('[data-g]');
+    if (chip) { S.game = chip.getAttribute('data-g'); saveS(); renderScore(); return; }
+    var sa = t.closest('[data-sa]');
+    if (sa && !sa.disabled) { act(sa.getAttribute('data-sa'), sa); return; }
+    if (t.closest('#undo')) { undo(); return; }
+    if (t.closest('#print')) { try { window.print(); } catch (err) { /* ignore */ } return; }
+    var ns = t.closest('#newsheet');
+    if (ns) {
+      if (armed) {
+        S.d[S.game] = fresh(S.game); hist[S.game] = []; saveS(); renderScore();
+      } else {
+        armed = true; ns.textContent = 'Tap again to clear this sheet';
+        setTimeout(function () { armed = false; var b = $('newsheet'); if (b) { b.textContent = 'New sheet'; } }, 4000);
+      }
+    }
+  });
+  scoreEl.addEventListener('change', function (e) {
+    var t = e.target, g = S.game, d = S.d[g];
+    if (t.hasAttribute('data-name')) {
+      var idx = parseInt(t.getAttribute('data-name'), 10);
+      S.names[idx] = t.value.trim() || ('Player ' + (idx + 1));
+      saveS(); renderScore();
+    } else if (t.hasAttribute('data-tgt')) {
+      var v = parseInt(t.value, 10);
+      if (v >= 1) { d.target = Math.min(999, v); saveS(); }
+      renderScore();
+    } else if (t.hasAttribute('data-sel')) {
+      snap();
+      var row = d.rows[parseInt(t.getAttribute('data-sel'), 10)];
+      row.d = parseInt(t.value, 10); row.a = null; row.b = null;
+      saveS(); renderScore();
+    }
+  });
+
+  /* ---------- Tabs ---------- */
+  var views = ['drills', 'rules', 'score'];
+  function show(v) {
+    views.forEach(function (k) {
+      $('view-' + k).hidden = (k !== v);
+      document.querySelector('[data-tab="' + k + '"]').setAttribute('aria-current', k === v ? 'page' : 'false');
+    });
+    if (v === 'rules') { renderRules(); }
+    if (v === 'score') { renderScore(); }
+    window.scrollTo(0, 0);
+  }
+  document.querySelector('.tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-tab]');
+    if (b) { show(b.getAttribute('data-tab')); }
+  });
+  $('view-rules').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-play]');
+    if (b) { S.game = b.getAttribute('data-play'); saveS(); show('score'); }
+  });
+
+  loadS();
 })();
 </script>
 </body>
