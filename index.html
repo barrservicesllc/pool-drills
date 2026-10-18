@@ -311,20 +311,20 @@ details p { margin: 4px 0 10px; }
   left: 0;
   right: 0;
   bottom: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   background: var(--surface);
   border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   z-index: 10;
 }
 .tabs button {
+  flex: 1 1 0;
   min-height: 58px;
   border: 0;
   background: none;
   color: var(--muted);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
 }
 .tabs button[aria-current="page"] { color: var(--chalk); box-shadow: inset 0 3px 0 var(--chalk); }
@@ -430,6 +430,22 @@ table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabu
 .ladder li.here { background: var(--bg); outline: 2px solid var(--cue); }
 .ladder li.here span { background: var(--cue); color: #111; }
 .print-head { display: none; }
+
+/* Giveaway */
+.give-teaser { margin: 0 0 18px; }
+.give-teaser[hidden] { display: none; }
+.gcard { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin: 0 0 14px; }
+.gcard h2 { font-size: 28px; font-weight: 700; line-height: 1.1; margin: 0 0 6px; }
+.gcard p { margin: 0 0 10px; }
+.meter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; margin: 10px 0; }
+.meter span { height: 14px; border-radius: 7px; background: var(--line); }
+.meter span.on { background: var(--cue); }
+.gsteps { margin: 0 0 6px; padding-left: 22px; }
+.gsteps li { margin: 0 0 8px; max-width: 60ch; }
+.code { display: block; margin-top: 4px; white-space: nowrap; font-family: var(--display); font-size: 26px; font-weight: 700; letter-spacing: .04em; color: var(--ink); }
+.fine { font-size: 14px; color: var(--muted); margin: 8px 0 0; }
+a.pbtn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.rbody p { margin: 0 0 8px; max-width: 62ch; }
 @media print {
   body { background: #fff; color: #000; }
   main { padding: 0; max-width: none; }
@@ -450,6 +466,7 @@ table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabu
   <section id="view-drills" class="view">
   <h1>30-Day Pool Practice</h1>
   <p class="lede">One drill a day. Score it, then come back tomorrow.</p>
+  <div class="give-teaser" id="give-teaser" hidden></div>
 
   <div class="stats" id="stats"></div>
   <div class="next-card" id="next"></div>
@@ -469,12 +486,14 @@ table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabu
   </section>
   <section id="view-rules" class="view" hidden></section>
   <section id="view-score" class="view" hidden></section>
+  <section id="view-give" class="view" hidden></section>
 </main>
 
 <nav class="tabs" aria-label="Sections">
   <button type="button" data-tab="drills" aria-current="page">Drills</button>
   <button type="button" data-tab="rules" aria-current="false">Rules</button>
-  <button type="button" data-tab="score" aria-current="false">Score sheets</button>
+  <button type="button" data-tab="score" aria-current="false">Score</button>
+  <button type="button" data-tab="give" aria-current="false" hidden>Giveaway</button>
 </nav>
 
 <dialog id="sheet" aria-labelledby="sheet-title"><div class="inner" id="inner"></div></dialog>
@@ -764,7 +783,7 @@ table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabu
       tableBase(id) + under + rings + lines + balls + texts + '</svg>';
   }
 
-  window.PoolData = { DRILLS: DRILLS };
+  window.PoolData = { DRILLS: DRILLS, getStore: function () { return store; } };
 
   var KEY = 'pool-drills-v1';
   var store = { scores: {}, dates: {} };
@@ -783,6 +802,7 @@ table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabu
     try { window.localStorage.setItem(KEY, JSON.stringify(store)); }
     catch (e) { storageOk = false; }
     renderNote();
+    try { document.dispatchEvent(new Event('pool:saved')); } catch (e2) { /* ignore */ }
   }
 
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -926,6 +946,8 @@ table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabu
     else if (act === 'save') {
       store.scores[current] = value;
       store.dates[current] = dayKey(new Date());
+      store.days = store.days || {};
+      store.days[dayKey(new Date())] = true;
       persist();
       renderAll();
       sheet.close();
@@ -1375,8 +1397,134 @@ table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabu
     }
   });
 
+  /* ---------- Giveaway ---------- */
+  // Fill these in to open a real giveaway. Until the required fields are set, the Giveaway tab stays hidden.
+  var GIVEAWAY = {
+    enabled: true,
+    preview: false,                // true shows a "sample details" notice
+    prize: 'JFS carbon fiber pool cue',
+    prizeValue: '$500',            // approximate retail value
+    sponsorName: 'J. Barr',
+    sponsorAddress: '',            // optional mailing address, shown in the Official Rules when set
+    contactEmail: 'jbarrailedger@gmail.com',
+    entryFormUrl: '',              // optional: a free form link used instead of email
+    startDate: '2026-10-19',       // 'YYYY-MM-DD'
+    endDate: '2027-01-01',
+    drawDate: '2027-01-04',
+    timeZone: 'Eastern Time',
+    eligibility: 'Legal residents of the United States who are 18 years or older, except where prohibited by law.',
+    daysPerEntry: 6,
+    maxEntries: 5
+  };
+  function isReady() {
+    var G = GIVEAWAY;
+    return !!(G.enabled && G.prize && G.prizeValue && G.sponsorName && (G.contactEmail || G.entryFormUrl) && G.startDate && G.endDate && G.drawDate);
+  }
+  function two(n) { return n < 10 ? '0' + n : '' + n; }
+  function todayStr() { var n = new Date(); return n.getFullYear() + '-' + two(n.getMonth() + 1) + '-' + two(n.getDate()); }
+  function fmt(d) {
+    if (!d) { return ''; }
+    var p = d.split('-');
+    return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+  function windowState() {
+    var t = todayStr();
+    if (t < GIVEAWAY.startDate) { return 'soon'; }
+    if (t > GIVEAWAY.endDate) { return 'closed'; }
+    return 'open';
+  }
+  function giveStats() {
+    var st = (window.PoolData && window.PoolData.getStore) ? window.PoolData.getStore() : {};
+    var src = st.days || {};
+    var set = {};
+    Object.keys(src).forEach(function (dt) {
+      if (dt >= GIVEAWAY.startDate && dt <= GIVEAWAY.endDate) { set[dt] = true; }
+    });
+    var days = Object.keys(set).length;
+    var entries = Math.min(GIVEAWAY.maxEntries, Math.floor(days / GIVEAWAY.daysPerEntry));
+    var toNext = entries >= GIVEAWAY.maxEntries ? 0 : GIVEAWAY.daysPerEntry - (days % GIVEAWAY.daysPerEntry);
+    return { days: days, entries: entries, toNext: toNext };
+  }
+  function deviceId() {
+    var id = '';
+    try {
+      id = window.localStorage.getItem('pool-gid') || '';
+      if (!id) { id = Math.random().toString(36).slice(2, 8).toUpperCase(); window.localStorage.setItem('pool-gid', id); }
+    } catch (e) { id = 'NOSAVE'; }
+    return id;
+  }
+  function sendHref(st, code) {
+    if (GIVEAWAY.entryFormUrl) { return GIVEAWAY.entryFormUrl; }
+    var body = 'Name:\nEmail:\nState:\nI am 18 or older and have read the Official Rules.\n\nEntry code: ' + code + '\nDays counted: ' + st.days + '\nEntries: ' + st.entries + '\n';
+    return 'mailto:' + GIVEAWAY.contactEmail + '?subject=' + encodeURIComponent('Pool drills giveaway entry ' + code) + '&body=' + encodeURIComponent(body);
+  }
+  function giveRulesHTML() {
+    var G = GIVEAWAY, per = G.daysPerEntry, max = G.maxEntries;
+    var contact = G.contactEmail ? esc(G.contactEmail) : 'the entry form';
+    var rows = [
+      ['No purchase necessary', 'No purchase or payment of any kind is needed to enter or win. Using the drills is free. Void where prohibited.'],
+      ['Sponsor', esc(G.sponsorName) + (G.sponsorAddress ? ', ' + esc(G.sponsorAddress) : '') + '. Questions and entries: ' + contact + '.'],
+      ['Who can enter', esc(G.eligibility) + ' The sponsor’s employees and their households cannot enter.'],
+      ['Entry period', 'From ' + fmt(G.startDate) + ' through ' + fmt(G.endDate) + ', 11:59 p.m. ' + esc(G.timeZone) + '.'],
+      ['How to enter', 'Complete drills in this guide and save your score for each one. Each calendar day on which you save at least one drill counts as one day, no matter how many drills you save that day. Every ' + per + ' counted days earns one entry, up to ' + max + ' entries per person. Scores are self-reported. Send your entries from the Giveaway tab before the entry period ends. One person per entry. Scripts, automated tools and other attempts to tamper with the process are not allowed, and the sponsor may remove any entry it believes is not genuine.'],
+      ['The drawing', 'One winner is chosen at random from all eligible entries on or about ' + fmt(G.drawDate) + '. Your odds depend on how many eligible entries are received.'],
+      ['Prize', 'One ' + esc(G.prize) + ', approximate retail value ' + esc(G.prizeValue) + '. No cash or substitute. The sponsor pays standard shipping to a U.S. address. The winner pays any taxes on the prize.'],
+      ['Winner', 'The winner is contacted by email and has 7 days to reply. If there is no reply, the sponsor may choose another winner. To ask for the winner’s name, write to ' + contact + ' after the drawing.'],
+      ['Your information', 'Names and email addresses are used only to run this giveaway, contact the winner and ship the prize. They are not sold.'],
+      ['Not affiliated', 'JFS is a trademark of its owner, which is not a sponsor of this giveaway. It is not sponsored, endorsed or run by JFS, Facebook, Instagram or any other site where it is promoted.'],
+      ['General', 'The sponsor may change or cancel the giveaway if it cannot run as planned. By entering, you agree to these Official Rules.']
+    ];
+    return rows.map(function (r) { return '<h4>' + r[0] + '</h4><p>' + r[1] + '</p>'; }).join('');
+  }
+  function renderGive() {
+    var G = GIVEAWAY, el = $('view-give');
+    if (!isReady()) { el.innerHTML = '<h1>Giveaway</h1><p class="lede">Not open right now.</p>'; return; }
+    var st = giveStats(), ws = windowState();
+    var segs = '';
+    for (var i = 0; i < G.maxEntries; i++) { segs += '<span' + (i < st.entries ? ' class="on"' : '') + '></span>'; }
+    var status = ws === 'soon' ? 'Opens ' + fmt(G.startDate) + '.' : (ws === 'open' ? 'Open until ' + fmt(G.endDate) + '.' : 'Closed. The drawing is on ' + fmt(G.drawDate) + '.');
+    var code = 'PD-' + deviceId() + '-' + st.entries;
+    var send = '';
+    if (ws === 'open') {
+      if (st.entries > 0) {
+        send = '<a class="pbtn" href="' + esc(sendHref(st, code)) + '"' + (G.entryFormUrl ? ' target="_blank" rel="noopener"' : '') + '>Send my entries</a>' +
+          '<p class="fine">' + (G.entryFormUrl ? 'Paste this code into the form: ' : 'Your email app opens with your entry filled in. Add your name and send it. Your code: ') + '<span class="code">' + code + '</span></p>';
+      } else {
+        send = '<button type="button" class="pbtn" disabled>Send my entries</button><p class="fine">Save a drill on ' + G.daysPerEntry + ' different days to earn your first entry.</p>';
+      }
+    }
+    var note = st.entries >= G.maxEntries ? 'You have all ' + G.maxEntries + ' entries.' : st.toNext + ' more ' + (st.toNext === 1 ? 'day' : 'days') + ' with a saved drill earns the next entry.';
+    el.innerHTML =
+      '<h1>Giveaway</h1><p class="lede">' + esc(status) + '</p>' +
+      (G.preview ? '<p class="banner">Preview with sample details. Not a live giveaway.</p>' : '') +
+      '<div class="gcard" style="margin-top:14px"><h2>Win a ' + esc(G.prize) + '</h2><p class="muted">Approximate retail value ' + esc(G.prizeValue) + '. Free to enter.</p></div>' +
+      '<div class="gcard"><h2>Your entries</h2><div class="meter" aria-hidden="true">' + segs + '</div>' +
+        '<p><b>' + st.entries + ' of ' + G.maxEntries + ' entries.</b> ' + st.days + ' ' + (st.days === 1 ? 'day' : 'days') + ' counted. ' + note + '</p>' + send + '</div>' +
+      '<div class="gcard"><h2>How to enter</h2><ol class="gsteps">' +
+        '<li>Do a drill and save your score on the Drills tab.</li>' +
+        '<li>Each day with at least one saved drill counts as one day. Doing several drills in one day still counts as one.</li>' +
+        '<li>Every ' + G.daysPerEntry + ' counted days earns one entry, up to ' + G.maxEntries + ' entries.</li>' +
+        '<li>Send your entries before ' + esc(fmt(G.endDate)) + '. One winner is picked at random on ' + esc(fmt(G.drawDate)) + '.</li></ol>' +
+        '<p class="fine">Scores are self-reported. One person per entry.</p></div>' +
+      '<details class="rule"><summary>Official rules</summary><div class="rbody">' + giveRulesHTML() + '</div></details>';
+  }
+  function renderTeaser() {
+    var G = GIVEAWAY, el = $('give-teaser');
+    var tab = document.querySelector('[data-tab="give"]');
+    var ready = isReady();
+    tab.hidden = !ready;
+    if (!ready) { el.hidden = true; return; }
+    var st = giveStats(), ws = windowState();
+    var line = ws === 'soon' ? 'Opens ' + fmt(G.startDate) + '. Drills saved before then do not count.'
+      : (ws === 'closed' ? 'The entry period has ended. The drawing is on ' + fmt(G.drawDate) + '.'
+        : 'You have ' + st.entries + ' of ' + G.maxEntries + ' entries. ' +
+          (st.entries >= G.maxEntries ? 'That is the maximum.' : st.toNext + ' more ' + (st.toNext === 1 ? 'day' : 'days') + ' with a saved drill earns the next one.'));
+    el.hidden = false;
+    el.innerHTML = '<div class="gcard"><h2>Win a ' + esc(G.prize) + '</h2><p>' + esc(line) + '</p><button type="button" class="pbtn" data-golink="give">See the giveaway</button></div>';
+  }
+
   /* ---------- Tabs ---------- */
-  var views = ['drills', 'rules', 'score'];
+  var views = ['drills', 'rules', 'score', 'give'];
   function show(v) {
     views.forEach(function (k) {
       $('view-' + k).hidden = (k !== v);
@@ -1384,6 +1532,8 @@ table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabu
     });
     if (v === 'rules') { renderRules(); }
     if (v === 'score') { renderScore(); }
+    if (v === 'give') { renderGive(); }
+    if (v === 'drills') { renderTeaser(); }
     window.scrollTo(0, 0);
   }
   document.querySelector('.tabs').addEventListener('click', function (e) {
@@ -1394,8 +1544,13 @@ table.turns { width: 100%; border-collapse: collapse; font-variant-numeric: tabu
     var b = e.target.closest('[data-play]');
     if (b) { S.game = b.getAttribute('data-play'); saveS(); show('score'); }
   });
+  $('give-teaser').addEventListener('click', function (e) {
+    if (e.target.closest('[data-golink]')) { show('give'); }
+  });
+  document.addEventListener('pool:saved', renderTeaser);
 
   loadS();
+  renderTeaser();
 })();
 </script>
 </body>
